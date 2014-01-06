@@ -2,6 +2,7 @@
 namespace FS\SolrBundle\Doctrine\Annotation;
 
 use Doctrine\Common\Annotations\Annotation;
+use Doctrine\ORM\PersistentCollection;
 
 /**
  * @Annotation
@@ -69,7 +70,19 @@ class Field extends Annotation
      */
     public function getValue()
     {
-        return $this->value;
+        $value = $this->value;
+
+        // Support collections:
+        if ($this->value instanceof PersistentCollection) {
+            $value = array();
+            foreach ($this->value as $val) {
+                $value []= (string) $val;
+            }
+
+            $value = implode(', ', $value);
+        }
+
+        return $value;
     }
 
     /**
